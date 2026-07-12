@@ -1,10 +1,12 @@
 "use client";
 
 import React, { useState } from "react";
-import { FileText, KeyRound, ArrowRight, Loader2 } from "lucide-react";
+import { FileText, KeyRound, ArrowRight, Loader2, Link2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import { useForm } from "react-hook-form";
 
 const GithubIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg
@@ -22,119 +24,134 @@ const GithubIcon = (props: React.SVGProps<SVGSVGElement>) => (
   </svg>
 );
 
+type FormInput = {
+  repoUrl: string;
+  projectName: string;
+  githubToken?: string;
+};
+
 export default function CreateProjectPage() {
-  const [projectName, setProjectName] = useState("");
-  const [repoUrl, setRepoUrl] = useState("");
-  const [token, setToken] = useState("");
+  const { register, handleSubmit, reset } = useForm<FormInput>();
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!projectName || !repoUrl) {
-      toast.error("Please fill in the Project Name and Repository URL.");
-      return;
-    }
-
+  function onSubmit(data: FormInput) {
     setLoading(true);
-    toast.promise(
-      new Promise((resolve) => setTimeout(resolve, 2000)),
-      {
-        loading: "Checking credits and validating repository...",
-        success: () => {
-          setLoading(false);
-          return "Validation successful! 150 credits required to scan this repository.";
-        },
-        error: () => {
-          setLoading(false);
-          return "Failed to validate repository. Please check your URL.";
-        },
-      }
-    );
-  };
+    setTimeout(() => {
+      setLoading(false);
+      toast.success("Project details captured!");
+      window.alert(JSON.stringify(data, null, 2));
+    }, 800);
+    return true;
+  }
 
   return (
     <div className="flex items-center justify-center min-h-[70vh] py-6 px-4 md:px-8">
-      <div className="grid md:grid-cols-12 gap-8 md:gap-12 max-w-5xl w-full items-center">
+      <div className="grid md:grid-cols-12 gap-8 md:gap-16 max-w-5xl w-full items-center">
         {/* Left Side: Vector Illustration */}
         <div className="md:col-span-5 flex justify-center items-center">
-          <div className="relative w-full max-w-[280px] sm:max-w-[340px] aspect-square rounded-full bg-slate-100/50 dark:bg-slate-800/20 p-6 border border-border/20 shadow-xs flex items-center justify-center">
+          <div className="relative w-full max-w-72 sm:max-w-80 aspect-square rounded-full bg-linear-to-tr from-primary/10 to-violet-500/10 dark:from-primary/20 dark:to-violet-500/20 p-8 border border-primary/20 shadow-xl flex items-center justify-center group overflow-hidden">
+            {/* Gradient glow effects */}
+            <div className="absolute inset-0 bg-linear-to-tr from-primary/25 to-violet-500/25 opacity-0 group-hover:opacity-100 transition-opacity duration-700 rounded-full blur-xl" />
             <img
               src="/github-illustration.png"
               alt="Developer working at laptop illustration"
-              className="w-full h-full object-contain mix-blend-multiply dark:mix-blend-normal rounded-full"
+              className="w-full h-full object-contain mix-blend-multiply dark:mix-blend-normal rounded-full z-10 transition-transform duration-500 group-hover:scale-105"
             />
           </div>
         </div>
 
         {/* Right Side: GitHub Linking Form */}
         <div className="md:col-span-7 flex flex-col gap-6 w-full max-w-md md:pl-4">
-          <div className="space-y-2">
-            <h1 className="text-[26px] md:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-tight">
-              Link your GitHub Repository
+          <div>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-semibold uppercase tracking-wider mb-3">
+              <GithubIcon className="h-3.5 w-3.5" />
+              Integrations
+            </div>
+            <h1 className="font-bold text-3xl tracking-tight bg-linear-to-r from-foreground to-foreground/80 bg-clip-text text-transparent">
+              Link your Github Repository
             </h1>
-            <p className="text-sm text-slate-500 dark:text-slate-400 font-medium leading-relaxed">
-              Enter the URL of your GitHub repository to link it to Dionysus.
+            <p className="text-sm text-muted-foreground mt-2">
+              Enter the URL of your repository to link it and start reviewing.
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Project Name Field */}
-            <div className="relative">
-              <FileText className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 dark:text-slate-500" />
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="projectName" className="text-sm font-medium flex items-center gap-2 text-foreground/85">
+                <FileText className="h-4 w-4 text-primary/80" />
+                Project Name
+              </Label>
               <Input
-                type="text"
-                placeholder="Project Name"
-                value={projectName}
-                onChange={(e) => setProjectName(e.target.value)}
+                id="projectName"
+                {...register("projectName", { required: true })}
+                placeholder="my-awesome-project"
+                className="h-10 bg-background/50 border-input/60 focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all rounded-lg"
+                required
                 disabled={loading}
-                className="pl-11 h-12 bg-white dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 text-sm font-medium rounded-xl transition-all shadow-xs focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:border-primary text-slate-900 dark:text-white placeholder:text-slate-400/80 dark:placeholder:text-slate-500"
               />
             </div>
 
-            {/* GitHub Repository URL Field */}
-            <div className="relative">
-              <GithubIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 dark:text-slate-500" />
+            <div className="space-y-2">
+              <Label htmlFor="repoUrl" className="text-sm font-medium flex items-center gap-2 text-foreground/85">
+                <Link2 className="h-4 w-4 text-primary/80" />
+                Github URL
+              </Label>
               <Input
-                type="text"
-                placeholder="Github Repository URL"
-                value={repoUrl}
-                onChange={(e) => setRepoUrl(e.target.value)}
+                id="repoUrl"
+                {...register("repoUrl", { required: true })}
+                placeholder="https://github.com/username/repository"
+                type="url"
+                className="h-10 bg-background/50 border-input/60 focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all rounded-lg"
+                required
                 disabled={loading}
-                className="pl-11 h-12 bg-white dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 text-sm font-medium rounded-xl transition-all shadow-xs focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:border-primary text-slate-900 dark:text-white placeholder:text-slate-400/80 dark:placeholder:text-slate-500"
               />
             </div>
 
-            {/* GitHub Token Field */}
-            <div className="relative">
-              <KeyRound className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 dark:text-slate-500" />
+            <div className="space-y-2">
+              <Label htmlFor="githubToken" className="text-sm font-medium flex items-center gap-2 text-foreground/85">
+                <KeyRound className="h-4 w-4 text-primary/80" />
+                GitHub Token <span className="text-xs text-muted-foreground font-normal">(Optional)</span>
+              </Label>
               <Input
+                id="githubToken"
+                {...register("githubToken")}
+                placeholder="ghp_xxxxxxxxxxxxxxxxxxxx"
                 type="password"
-                placeholder="GitHub Token (optional, for private repositories)"
-                value={token}
-                onChange={(e) => setToken(e.target.value)}
+                className="h-10 bg-background/50 border-input/60 focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all rounded-lg"
                 disabled={loading}
-                className="pl-11 h-12 bg-white dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 text-sm font-medium rounded-xl transition-all shadow-xs focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:border-primary text-slate-900 dark:text-white placeholder:text-slate-400/80 dark:placeholder:text-slate-500"
               />
+              <p className="text-[11px] text-muted-foreground px-0.5">
+                Provide a personal access token for private repositories.
+              </p>
             </div>
 
-            {/* Submit Button */}
-            <div className="pt-2">
+            {/* Submit & Reset Buttons */}
+            <div className="pt-4 flex items-center gap-3">
               <Button
                 type="submit"
                 disabled={loading}
-                className="h-11 px-6 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold transition-all shadow-md shadow-blue-500/20 active:scale-[0.98] flex items-center gap-2"
+                className="h-11 px-6 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-semibold transition-all shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/30 active:scale-[0.98] flex items-center gap-2 cursor-pointer"
               >
                 {loading ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    <span>Checking...</span>
+                    <span>Connecting...</span>
                   </>
                 ) : (
                   <>
-                    <span>Check Credits</span>
-                    <ArrowRight className="h-4 w-4" />
+                    <span>Create Project</span>
+                    <ArrowRight className="h-4 w-4 transition-transform group-hover/button:translate-x-0.5" />
                   </>
                 )}
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                disabled={loading}
+                onClick={() => reset()}
+                className="h-11 px-4 rounded-xl border border-border hover:bg-accent hover:text-accent-foreground font-semibold transition-all cursor-pointer"
+              >
+                Reset
               </Button>
             </div>
           </form>
