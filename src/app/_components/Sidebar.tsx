@@ -18,6 +18,7 @@ import { usePathname } from "next/navigation";
 import React from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { useProject } from "@/hooks/use-project";
 
 const items = [
   {
@@ -42,12 +43,6 @@ const items = [
   },
 ];
 
-const projects = [
-  "Project 1",
-  "Project 2",
-  "Project 3",
-];
-
 interface UserProps {
   email?: string;
 }
@@ -67,6 +62,7 @@ interface AppSidebarProps {
 export default function AppSidebar({ user, dbUser, signOutAction }: AppSidebarProps) {
   const pathname = usePathname();
   const [mounted, setMounted] = React.useState(false);
+  const { projects, projectId, setProjectId, isLoading } = useProject();
 
   React.useEffect(() => {
     setMounted(true);
@@ -121,26 +117,50 @@ export default function AppSidebar({ user, dbUser, signOutAction }: AppSidebarPr
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu className="gap-1 px-2">
-              {projects.map((projectName) => {
-                return (
-                  <SidebarMenuItem key={projectName}>
-                    <SidebarMenuButton
-                      tooltip={projectName}
-                      render={<Link href="/dashboard" />}
-                      className="w-full transition-all duration-200 h-11 px-3 rounded-xl flex items-center gap-3.5 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground text-muted-foreground font-medium"
-                    >
-                      <div 
-                        className="flex h-8.5 w-8.5 shrink-0 items-center justify-center rounded-lg text-[12px] font-bold border border-primary bg-primary text-primary-foreground transition-colors shadow-xs"
+              {isLoading ? (
+                <div className="flex flex-col gap-2 p-2">
+                  <div className="h-6 bg-muted animate-pulse rounded-lg w-full" />
+                  <div className="h-6 bg-muted animate-pulse rounded-lg w-3/4" />
+                  <div className="h-6 bg-muted animate-pulse rounded-lg w-5/6" />
+                </div>
+              ) : projects && projects.length > 0 ? (
+                projects.map((project) => {
+                  const isActive = project.id === projectId;
+                  return (
+                    <SidebarMenuItem key={project.id}>
+                      <SidebarMenuButton
+                        tooltip={project.name}
+                        render={<Link href="/dashboard" />}
+                        onClick={() => setProjectId(project.id)}
+                        className={cn(
+                          "w-full transition-all duration-200 h-11 px-3 rounded-xl flex items-center gap-3.5 font-medium cursor-pointer",
+                          isActive
+                            ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                            : "hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground text-muted-foreground"
+                        )}
                       >
-                        {projectName.charAt(0)}
-                      </div>
-                      <span className="truncate text-foreground/90 font-medium text-[13px]">
-                        {projectName}
-                      </span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                );
-              })}
+                        <div 
+                          className={cn(
+                            "flex h-8.5 w-8.5 shrink-0 items-center justify-center rounded-lg text-[12px] font-bold border transition-colors shadow-xs",
+                            isActive
+                              ? "border-primary bg-primary text-primary-foreground"
+                              : "border-border bg-muted text-muted-foreground"
+                          )}
+                        >
+                          {project.name.charAt(0).toUpperCase()}
+                        </div>
+                        <span className="truncate text-foreground/90 font-medium text-[13px]">
+                          {project.name}
+                        </span>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  );
+                })
+              ) : (
+                <div className="text-xs text-muted-foreground/60 px-4 py-2">
+                  No projects linked
+                </div>
+              )}
             </SidebarMenu>
           </SidebarGroupContent>
           

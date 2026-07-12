@@ -21,7 +21,7 @@ model Post {
 }
 
 model User {
-  id        String   @id @default(cuid())
+  id        String   @id
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -32,4 +32,20 @@ model User {
   emailAddress String @unique
 
   credits Int @default(150)
+
+  projects Project[]
+}
+
+model Project {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name      String
+  githubUrl String
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  deletedAt DateTime?
 }

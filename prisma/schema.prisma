@@ -20,18 +20,32 @@ model Post {
     @@index([name])
 }
 
-
-model User{
-    id String @id 
+model User {
+    id        String   @id 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
-    imageUrl String?
+    imageUrl  String?
     firstname String?
-    lastname String?
+    lastname  String?
     
     emailAddress  String @unique
     
     credits Int @default(150)
+    
+    projects Project[]
+}
 
+model Project {
+    id        String   @id @default(cuid())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    name      String 
+    githubUrl String
+
+    userId    String
+    user      User     @relation(fields: [userId], references: [id])
+
+    deletedAt DateTime?
 }
