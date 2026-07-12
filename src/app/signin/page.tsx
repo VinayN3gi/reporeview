@@ -38,7 +38,7 @@ function SignInForm() {
         setIsLoading(false);
       } else {
         router.refresh();
-        router.push("/");
+        router.push("/dashboard");
       }
     } catch (err: unknown) {
       const errMsg = err instanceof Error ? err.message : "An unexpected error occurred.";

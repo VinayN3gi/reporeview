@@ -47,9 +47,9 @@ export async function updateSession(request: NextRequest) {
   }
 
   if (user && isAuthPage) {
-    // User is logged in, redirect to home
+    // User is logged in, redirect to dashboard
     const url = request.nextUrl.clone();
-    url.pathname = "/";
+    url.pathname = "/dashboard";
     return NextResponse.redirect(url);
   }
 

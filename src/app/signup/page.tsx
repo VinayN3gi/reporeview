@@ -54,7 +54,7 @@ export default function SignUpPage() {
         } else {
           if (data.session) {
             router.refresh();
-            router.push("/");
+            router.push("/dashboard");
           } else {
             setMessage("Registration successful! Please check your email to confirm your account.");
             setIsLoading(false);
