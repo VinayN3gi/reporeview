@@ -38,7 +38,7 @@ export default async function SidebarLayout({ children }: Props) {
     <SidebarProvider className="flex-col h-screen w-screen overflow-hidden bg-background">
       <div className="flex h-screen w-screen flex-col overflow-hidden bg-background text-foreground dark:[color-scheme:dark] p-3 gap-3">
         {/* Top Navbar */}
-        <header className="flex h-16 shrink-0 items-center justify-between border border-border bg-card/55 px-6 backdrop-blur-md z-10 rounded-2xl shadow-md">
+        <header className="flex h-16 shrink-0 items-center justify-between border border-border bg-card/90 px-6 backdrop-blur-md z-10 rounded-2xl shadow-md">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-md shadow-primary/30">
               <Code2 className="h-5.5 w-5.5" />
@@ -77,7 +77,7 @@ export default async function SidebarLayout({ children }: Props) {
           <AppSidebar user={user} dbUser={dbUser} signOutAction={signOutAction} />
           
           {/* Page Content Panel */}
-          <main className="flex-1 overflow-y-auto bg-card/55 border border-border rounded-2xl shadow-md p-6 md:p-8">
+          <main className="flex-1 overflow-y-auto bg-card/90 border border-border rounded-2xl shadow-md p-6 md:p-8">
             <div className="mx-auto max-w-7xl">
               {children}
             </div>

@@ -81,7 +81,7 @@ export default function AppSidebar({ user, dbUser, signOutAction }: AppSidebarPr
     : user?.email?.substring(0, 2).toUpperCase() ?? "US";
 
   return (
-    <Sidebar collapsible="none" className="border border-border bg-card/55 backdrop-blur-md rounded-2xl shadow-md h-full">
+    <Sidebar collapsible="none" className="border border-border bg-card/90 backdrop-blur-md rounded-2xl shadow-md h-full">
       <SidebarContent className="py-4">
         <SidebarGroup>
           <SidebarGroupLabel className="px-4 text-[11px] font-bold text-muted-foreground/75 tracking-wider uppercase mb-2">
@@ -146,12 +146,14 @@ export default function AppSidebar({ user, dbUser, signOutAction }: AppSidebarPr
           
           {/* Create Project Button */}
           <div className="px-2 mt-3">
-            <button 
-              className="flex items-center gap-2.5 px-4 h-10 border border-border/80 bg-card hover:bg-sidebar-accent text-foreground text-[13px] font-bold rounded-xl transition-all shadow-xs cursor-pointer active:scale-98"
-            >
-              <Plus className="h-4.5 w-4.5 text-muted-foreground" />
-              <span>Create Project</span>
-            </button>
+            <Link href="/create" className="w-full block">
+              <button 
+                className="flex items-center gap-2.5 w-full px-4 h-10 border border-border/80 bg-card hover:bg-sidebar-accent text-foreground text-[13px] font-bold rounded-xl transition-all shadow-xs cursor-pointer active:scale-98"
+              >
+                <Plus className="h-4.5 w-4.5 text-muted-foreground" />
+                <span>Create Project</span>
+              </button>
+            </Link>
           </div>
         </SidebarGroup>
       </SidebarContent>
