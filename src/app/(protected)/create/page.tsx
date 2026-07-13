@@ -33,6 +33,7 @@ type FormInput = {
 
 export default function CreateProjectPage() {
   const { register, handleSubmit, reset } = useForm<FormInput>();
+  const utils = api.useUtils();
 
   const createProject = api.project.createProject.useMutation({
     onSuccess: (data) => {
@@ -40,6 +41,7 @@ export default function CreateProjectPage() {
         description: `Successfully linked and created the project "${data.name}".`,
       });
       reset();
+      void utils.project.getProjects.invalidate();
     },
     onError: (err) => {
       toast.error("Failed to Create Project", {
