@@ -214,6 +214,7 @@ export default function DashboardPage() {
                     author={commit.commitAuthorName}
                     timeAgo={formatDistanceToNow(new Date(commit.commitDate), { addSuffix: true })}
                     title={commit.commitMessage}
+                    summary={commit.summary}
                   />
                 </div>
               </div>

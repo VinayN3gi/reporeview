@@ -2,7 +2,10 @@ import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "../trpc";
 import { getCurrentUserAction } from "@/app/actions/user";
 import { TRPCError } from "@trpc/server";
-import { getCommitHashes } from "@/lib/github";
+import { getCommitHashes, getCommitDiff } from "@/lib/github";
+import { summarizeCommit } from "@/lib/gemini";
+
+
 
 export const projectRouter = createTRPCRouter({
   createProject: publicProcedure
@@ -128,6 +131,25 @@ export const projectRouter = createTRPCRouter({
         const nextItem = commits.pop(); // remove the extra item
         nextCursor = nextItem!.id;
       }
+
+      // Generate summaries for commits in this page that don't have one yet
+      await Promise.all(
+        commits.map(async (commit) => {
+          if (!commit.summary) {
+            try {
+              const diff = await getCommitDiff(project.githubUrl, commit.commitHash);
+              const summary = await summarizeCommit(diff);
+              await ctx.db.commit.update({
+                where: { id: commit.id },
+                data: { summary },
+              });
+              commit.summary = summary;
+            } catch (err) {
+              console.error(`Failed to summarize commit ${commit.commitHash}:`, err);
+            }
+          }
+        })
+      );
 
       return {
         commits,

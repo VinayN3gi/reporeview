@@ -29,3 +29,15 @@ export const getCommitHashes=async(githubUrl : string) : Promise<CommitResponse[
         commitDate : commit.commit?.author?.date ?? "",
     }))
 }
+
+export const getCommitDiff = async (githubUrl: string, commitHash: string): Promise<string> => {
+    const [owner, repo] = githubUrl.split('/').slice(-2);
+    const { data } = await octokit.rest.repos.getCommit({
+        owner: owner!,
+        repo: repo!,
+        ref: commitHash,
+        mediaType: { format: "diff" },
+    });
+    // When format is "diff", data is returned as a raw string
+    return data as unknown as string;
+};
