@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { useProject } from "@/hooks/use-project";
+import { api } from "@/trpc/react";
 import {
   ExternalLink,
   Users,
@@ -12,9 +13,11 @@ import {
   GitBranch,
   Loader2,
   Sparkles,
+  ChevronDown,
 } from "lucide-react";
 import Link from "next/link";
 import CommitCard from "./commit-card";
+import { formatDistanceToNow } from "date-fns";
 
 const GithubIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg
@@ -32,67 +35,26 @@ const GithubIcon = (props: React.SVGProps<SVGSVGElement>) => (
   </svg>
 );
 
-// Dummy commit data per project keyed by project id — fallback to generic
-function getDummyCommits(projectName: string) {
-  return [
-    {
-      id: "1",
-      author: "Tomaz Bratanic",
-      avatar: "TB",
-      action: "committed",
-      timeAgo: "4 days ago",
-      title: `Add support for more LLM models (#186)`,
-      bullets: [
-        `Added support for AWS Bedrock models [chains.py, env.example, pull_model.Dockerfile]`,
-        `Added support for \`gpt-4o\` and \`gpt-4-turbo\` models [chains.py, env.example, pull_model.Dockerfile]`,
-        `Updated the list of supported models in \`pull_model.Dockerfile\``,
-      ],
-    },
-    {
-      id: "2",
-      author: "Sarah Chen",
-      avatar: "SC",
-      action: "committed",
-      timeAgo: "5 days ago",
-      title: `Fix authentication middleware for edge runtime (#185)`,
-      bullets: [
-        `Updated middleware.ts to handle Supabase SSR cookies properly`,
-        `Fixed redirect loop on protected routes`,
-        `Added error boundary for auth failures`,
-      ],
-    },
-    {
-      id: "3",
-      author: "Alex Rivera",
-      avatar: "AR",
-      action: "committed",
-      timeAgo: "1 week ago",
-      title: `Refactor database schema and add indexes (#184)`,
-      bullets: [
-        `Added composite index on [userId, createdAt] for projects table`,
-        `Optimized query performance for project listing endpoint`,
-        `Updated Prisma schema with new relations`,
-      ],
-    },
-    {
-      id: "4",
-      author: "Jordan Lee",
-      avatar: "JL",
-      action: "committed",
-      timeAgo: "1 week ago",
-      title: `Implement dark mode support across all components (#183)`,
-      bullets: [
-        `Added CSS custom properties for dark theme colors`,
-        `Updated Card, Badge, and Button components with dark variants`,
-        `Fixed contrast issues in sidebar navigation`,
-      ],
-    },
-  ];
-}
-
 export default function DashboardPage() {
-  const { project, isLoading } = useProject();
+  const { project, projectId, isLoading } = useProject();
   const [question, setQuestion] = useState("");
+
+  const {
+    data: commitsData,
+    isLoading: commitsLoading,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = api.project.getCommits.useInfiniteQuery(
+    { projectId: projectId! },
+    {
+      enabled: !!projectId,
+      getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
+    }
+  );
+
+  // Flatten all pages into a single commits array
+  const commits = commitsData?.pages.flatMap((page) => page.commits) ?? [];
 
   if (isLoading) {
     return (
@@ -126,8 +88,6 @@ export default function DashboardPage() {
       </div>
     );
   }
-
-  const commits = getDummyCommits(project.name);
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
@@ -224,35 +184,70 @@ export default function DashboardPage() {
       </div>
 
       {/* Commit Activity Feed — Timeline */}
-      <div className="relative">
-        {/* Vertical timeline line */}
-        <div className="absolute left-[17px] top-6 bottom-6 w-[2px] bg-border" />
-
-        <div className="flex flex-col gap-3">
-          {commits.map((commit) => (
-            <div key={commit.id} className="relative flex items-start gap-4">
-              {/* Author avatar on the timeline */}
-              <div className="relative z-10 shrink-0 mt-4">
-                <img
-                  src={`https://api.dicebear.com/9.x/initials/svg?seed=${commit.author}&backgroundColor=b6e3f4,c0aede,d1d4f9,ffd5dc,ffdfbf&textColor=36454f&fontSize=42`}
-                  alt={commit.author}
-                  className="h-9 w-9 rounded-full border-2 border-background shadow-sm bg-muted"
-                />
-              </div>
-
-              {/* Card */}
-              <div className="flex-1 min-w-0">
-                <CommitCard
-                  author={commit.author}
-                  timeAgo={commit.timeAgo}
-                  title={commit.title}
-                  bullets={commit.bullets}
-                />
-              </div>
-            </div>
-          ))}
+      {commitsLoading ? (
+        <div className="flex items-center justify-center py-12">
+          <div className="flex flex-col items-center gap-3">
+            <Loader2 className="h-6 w-6 animate-spin text-primary" />
+            <p className="text-sm text-muted-foreground font-medium">Fetching commits...</p>
+          </div>
         </div>
-      </div>
+      ) : commits.length > 0 ? (
+        <div className="relative">
+          {/* Vertical timeline line */}
+          <div className="absolute left-[17px] top-6 bottom-6 w-[2px] bg-border" />
+
+          <div className="flex flex-col gap-3">
+            {commits.map((commit) => (
+              <div key={commit.commitHash} className="relative flex items-start gap-4">
+                {/* Author avatar on the timeline */}
+                <div className="relative z-10 shrink-0 mt-4">
+                  <img
+                    src={commit.commitAuthorAvatar || `https://api.dicebear.com/9.x/initials/svg?seed=${commit.commitAuthorName}&backgroundColor=b6e3f4,c0aede,d1d4f9,ffd5dc,ffdfbf&textColor=36454f&fontSize=42`}
+                    alt={commit.commitAuthorName}
+                    className="h-9 w-9 rounded-full border-2 border-background shadow-sm bg-muted"
+                  />
+                </div>
+
+                {/* Card */}
+                <div className="flex-1 min-w-0">
+                  <CommitCard
+                    author={commit.commitAuthorName}
+                    timeAgo={formatDistanceToNow(new Date(commit.commitDate), { addSuffix: true })}
+                    title={commit.commitMessage}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Load More Button */}
+          {hasNextPage && (
+            <div className="flex justify-center mt-6">
+              <button
+                onClick={() => fetchNextPage()}
+                disabled={isFetchingNextPage}
+                className="inline-flex items-center gap-2 px-5 py-2.5 border border-border bg-card hover:bg-accent text-foreground rounded-xl text-sm font-semibold transition-all hover:shadow-sm active:scale-[0.98] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isFetchingNextPage ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Loading...
+                  </>
+                ) : (
+                  <>
+                    <ChevronDown className="h-4 w-4" />
+                    Load More Commits
+                  </>
+                )}
+              </button>
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className="text-center py-12">
+          <p className="text-sm text-muted-foreground">No commits found for this project.</p>
+        </div>
+      )}
     </div>
   );
 }

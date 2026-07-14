@@ -7,10 +7,14 @@ interface CommitCardProps {
   author: string;
   timeAgo: string;
   title: string;
-  bullets: string[];
 }
 
-export default function CommitCard({ author, timeAgo, title, bullets }: CommitCardProps) {
+export default function CommitCard({ author, timeAgo, title }: CommitCardProps) {
+  // Split commit message into first line (title) and remaining lines (details)
+  const lines = title.split("\n").filter((l) => l.trim());
+  const heading = lines[0] ?? title;
+  const details = lines.slice(1);
+
   return (
     <div className="border border-border bg-card rounded-2xl px-6 py-5 shadow-sm hover:shadow-md transition-shadow duration-200">
       {/* Author Row */}
@@ -24,30 +28,19 @@ export default function CommitCard({ author, timeAgo, title, bullets }: CommitCa
       </div>
 
       {/* Commit Title */}
-      <h4 className="text-sm font-bold text-foreground mb-2.5">{title}</h4>
+      <h4 className="text-sm font-bold text-foreground mb-1">{heading}</h4>
 
-      {/* Bullet Points */}
-      <ul className="space-y-1">
-        {bullets.map((bullet, i) => (
-          <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground leading-relaxed">
-            <span className="shrink-0 mt-px select-none">✱</span>
-            <span>
-              {bullet.split(/(`[^`]+`)/).map((part, j) =>
-                part.startsWith("`") && part.endsWith("`") ? (
-                  <code
-                    key={j}
-                    className="text-xs bg-muted px-1 py-0.5 rounded font-mono text-foreground/80"
-                  >
-                    {part.slice(1, -1)}
-                  </code>
-                ) : (
-                  <span key={j}>{part}</span>
-                )
-              )}
-            </span>
-          </li>
-        ))}
-      </ul>
+      {/* Commit Details (extra lines from the message) */}
+      {details.length > 0 && (
+        <ul className="space-y-1 mt-2">
+          {details.map((line, i) => (
+            <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground leading-relaxed">
+              <span className="shrink-0 mt-px select-none">✱</span>
+              <span>{line.replace(/^[-*]\s*/, "")}</span>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }
