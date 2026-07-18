@@ -56,6 +56,7 @@ export default function CreateProjectPage() {
     createProject.mutate({
       name: data.projectName,
       githubUrl: data.repoUrl,
+      githubToken: data.githubToken,
     });
   }
 

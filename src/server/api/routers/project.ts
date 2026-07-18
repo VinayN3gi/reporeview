@@ -4,6 +4,7 @@ import { getCurrentUserAction } from "@/app/actions/user";
 import { TRPCError } from "@trpc/server";
 import { getCommitHashes, getCommitDiff } from "@/lib/github";
 import { summarizeCommit } from "@/lib/gemini";
+import { indexGithubRepo } from "@/lib/github-loader";
 
 
 
@@ -13,6 +14,7 @@ export const projectRouter = createTRPCRouter({
       z.object({
         name: z.string().min(1, "Project name is required"),
         githubUrl: z.string().url("Must be a valid URL"),
+        githubToken: z.string().optional(),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -28,13 +30,21 @@ export const projectRouter = createTRPCRouter({
       const userId = user.id;
       console.log("Found userId inside tRPC:", userId);
 
-      return ctx.db.project.create({
+      const project = await ctx.db.project.create({
         data: {
           name: input.name,
           githubUrl: input.githubUrl,
           userId: userId,
         },
       });
+
+      try {
+        await indexGithubRepo(project.id, input.githubUrl, input.githubToken);
+      } catch (error) {
+        console.error("Failed to index github repo:", error);
+      }
+
+      return project;
     }),
 
   getProjects: publicProcedure.query(async ({ ctx }) => {
