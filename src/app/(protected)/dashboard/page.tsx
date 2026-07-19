@@ -18,6 +18,13 @@ import {
 import Link from "next/link";
 import CommitCard from "./commit-card";
 import { formatDistanceToNow } from "date-fns";
+import { askQuestion } from "@/lib/action";
+import dynamic from "next/dynamic";
+
+const MDEditorMarkdown = dynamic(
+  () => import("@uiw/react-md-editor").then((mod) => mod.default.Markdown),
+  { ssr: false }
+);
 
 const GithubIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg
@@ -38,6 +45,29 @@ const GithubIcon = (props: React.SVGProps<SVGSVGElement>) => (
 export default function DashboardPage() {
   const { project, projectId, isLoading } = useProject();
   const [question, setQuestion] = useState("");
+  const [answer, setAnswer] = useState("");
+  const [asking, setAsking] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+
+  React.useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  const onSubmitQuestion = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!question.trim() || !projectId) return;
+    setAsking(true);
+    setAnswer("");
+    try {
+      const res = await askQuestion(question, projectId);
+      setAnswer(res);
+    } catch (error) {
+      console.error(error);
+      setAnswer("Sorry, I encountered an error while answering your question.");
+    } finally {
+      setAsking(false);
+    }
+  };
 
   const {
     data: commitsData,
@@ -56,7 +86,7 @@ export default function DashboardPage() {
   // Flatten all pages into a single commits array
   const commits = commitsData?.pages.flatMap((page) => page.commits) ?? [];
 
-  if (isLoading) {
+  if (!isMounted || isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="flex flex-col items-center gap-4">
@@ -123,7 +153,7 @@ export default function DashboardPage() {
         {/* Ask a Question Card */}
         <div className="group relative overflow-hidden border border-border bg-card rounded-2xl p-6 shadow-sm hover:shadow-md transition-all duration-300">
           {/* Subtle gradient accent */}
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.03] to-transparent pointer-events-none" />
+          <div className="absolute inset-0 bg-linear-to-br from-primary/3 to-transparent pointer-events-none" />
           <div className="relative space-y-4">
             <div>
               <h3 className="text-lg font-bold text-foreground flex items-center gap-2">
@@ -137,7 +167,7 @@ export default function DashboardPage() {
             </div>
 
             {/* Question Input */}
-            <div className="relative">
+            <form onSubmit={onSubmitQuestion} className="relative space-y-4">
               <textarea
                 value={question}
                 onChange={(e) => setQuestion(e.target.value)}
@@ -145,21 +175,34 @@ export default function DashboardPage() {
                 rows={3}
                 className="w-full resize-none rounded-xl border border-border bg-background/60 px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
               />
-            </div>
+              
+              <button
+                type="submit"
+                disabled={asking || !question.trim()}
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-primary-foreground rounded-xl text-sm font-semibold hover:bg-primary/90 transition-all shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/30 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {asking ? <Loader2 className="h-4 w-4 animate-spin" /> : <Bot className="h-4 w-4" />}
+                {asking ? "Asking..." : "Ask Repo Review!"}
+              </button>
+            </form>
 
-            <Link
-              href="/qa"
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-primary-foreground rounded-xl text-sm font-semibold hover:bg-primary/90 transition-all shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/30 active:scale-[0.98]"
-            >
-              <Bot className="h-4 w-4" />
-              Ask Repo Review!
-            </Link>
+            {answer && (
+              <div className="mt-4 p-4 bg-background/80 rounded-xl border border-border">
+                <div className="flex items-center gap-2 mb-2">
+                  <Sparkles className="h-4 w-4 text-primary" />
+                  <span className="text-sm font-semibold text-primary">Answer</span>
+                </div>
+                <div className="text-sm text-foreground/90 prose prose-sm dark:prose-invert max-w-none" data-color-mode="light">
+                  <MDEditorMarkdown source={answer} style={{ background: 'transparent' }} />
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
         {/* Create a New Meeting Card */}
         <div className="group relative overflow-hidden border border-border bg-card rounded-2xl p-6 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col items-center justify-center text-center">
-          <div className="absolute inset-0 bg-gradient-to-br from-violet-500/[0.03] to-transparent pointer-events-none" />
+          <div className="absolute inset-0 bg-linear-to-br from-violet-500/3 to-transparent pointer-events-none" />
           <div className="relative flex flex-col items-center gap-4">
             <div className="h-16 w-16 rounded-2xl bg-muted/60 flex items-center justify-center border border-border/50">
               <Monitor className="h-8 w-8 text-foreground/70" />

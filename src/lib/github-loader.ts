@@ -27,8 +27,24 @@ export const loadGithubRepo = async(githubUrl : string , githubToken? : string) 
         maxConcurrency : 5
     })
 
-    const docs=await loader.load()
-    return docs
+    const docs = await loader.load()
+    
+    // Filter out non-important files to speed up processing
+    const filteredDocs = docs.filter(doc => {
+        const filePath = doc.metadata.source as string || '';
+        
+        // Exclude common non-source extensions
+        const nonImportantExts = ['.svg', '.png', '.jpg', '.jpeg', '.gif', '.ico', '.md', '.txt', '.json', '.yaml', '.yml', '.toml', '.lock'];
+        const isNonImportantExt = nonImportantExts.some(ext => filePath.toLowerCase().endsWith(ext));
+        
+        // Exclude common directories
+        const nonImportantDirs = ['node_modules/', 'dist/', 'build/', 'public/', '.next/'];
+        const isNonImportantDir = nonImportantDirs.some(dir => filePath.toLowerCase().includes(dir));
+        
+        return !isNonImportantExt && !isNonImportantDir;
+    });
+
+    return filteredDocs;
 }
 
 

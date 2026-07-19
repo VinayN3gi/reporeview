@@ -50,8 +50,8 @@ export default function CommitCard({ author, timeAgo, title, summary }: CommitCa
 
       {/* AI Summary Section */}
       {summaryLines.length > 0 && (
-        <div className="mt-4 p-4 rounded-xl bg-primary/[0.03] border border-primary/10 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.01] to-transparent pointer-events-none" />
+        <div className="mt-4 p-4 rounded-xl bg-primary/3 border border-primary/10 relative overflow-hidden">
+          <div className="absolute inset-0 bg-linear-to-br from-primary/1 to-transparent pointer-events-none" />
           <div className="flex items-center gap-1.5 text-xs font-semibold text-primary mb-2">
             <Sparkles className="h-3.5 w-3.5" />
             <span>AI Summary</span>
