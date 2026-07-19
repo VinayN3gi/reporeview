@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, Video, Clock, Users, Plus, Play, ExternalLink } from "lucide-react";
+import { UploadMeeting } from "@/components/UploadMeeting";
 
 export const dynamic = "force-dynamic";
 
@@ -43,7 +44,16 @@ export default async function MeetingsPage() {
 
   return (
     <div className="space-y-8">
-      Meetings
+      <div className="flex flex-col space-y-4 md:flex-row md:items-center md:justify-between md:space-y-0">
+        <div>
+          <h2 className="text-2xl font-bold tracking-tight">Meetings</h2>
+          <p className="text-muted-foreground">
+            Manage your meeting recordings and transcripts.
+          </p>
+        </div>
+      </div>
+      
+      <UploadMeeting />
     </div>
   );
 }

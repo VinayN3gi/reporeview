@@ -20,6 +20,8 @@ import CommitCard from "./commit-card";
 import { formatDistanceToNow } from "date-fns";
 import { askQuestion } from "@/lib/action";
 import dynamic from "next/dynamic";
+import { UploadMeeting } from "@/components/UploadMeeting";
+import { Dialog, DialogContent, DialogTrigger, DialogTitle } from "@/components/ui/dialog";
 
 const MDEditorMarkdown = dynamic(
   () => import("@uiw/react-md-editor").then((mod) => mod.default.Markdown),
@@ -215,13 +217,18 @@ export default function DashboardPage() {
                 <span className="text-xs font-medium text-primary/80">Powered by AI.</span>
               </p>
             </div>
-            <Link
-              href="/meetings"
-              className="inline-flex items-center gap-2 px-5 py-2.5 border-2 border-foreground/80 text-foreground rounded-xl text-sm font-bold hover:bg-foreground hover:text-background transition-all active:scale-[0.98]"
-            >
-              <Upload className="h-4 w-4" />
-              Upload Meeting
-            </Link>
+            <Dialog>
+              <DialogTrigger
+                className="inline-flex items-center gap-2 px-5 py-2.5 border-2 border-foreground/80 text-foreground rounded-xl text-sm font-bold hover:bg-foreground hover:text-background transition-all active:scale-[0.98]"
+              >
+                <Upload className="h-4 w-4" />
+                Upload Meeting
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-xl p-0 border-none bg-transparent shadow-none">
+                <DialogTitle className="sr-only">Upload Meeting</DialogTitle>
+                <UploadMeeting />
+              </DialogContent>
+            </Dialog>
           </div>
         </div>
       </div>

@@ -19,7 +19,7 @@ function Progress({
     >
       {children}
       <ProgressTrack>
-        <ProgressIndicator />
+        <ProgressIndicator style={{ width: `${value || 0}%` }} />
       </ProgressTrack>
     </ProgressPrimitive.Root>
   )
