@@ -63,29 +63,35 @@ export default function QaPage() {
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-7rem)] -m-6 md:-m-8 w-[calc(100%+3rem)] md:w-[calc(100%+4rem)] animate-in fade-in duration-500 overflow-hidden bg-background">
-      {/* Header */}
-      <div className="flex items-center gap-3 px-8 py-3 border-b border-border/50 bg-card/40 z-10 shrink-0">
-        <div className="h-9 w-9 rounded-xl bg-linear-to-br from-primary/20 to-primary/5 flex items-center justify-center shadow-inner border border-primary/10">
-          <Sparkles className="h-4 w-4 text-primary" />
-        </div>
-        <div>
-          <h1 className="text-lg font-bold text-foreground">Repo Review Q&A</h1>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            Ask questions about <span className="font-semibold text-primary">{project?.name || "your project"}</span>
-          </p>
-        </div>
-      </div>
-
+    <div className="flex flex-col h-[calc(100vh-4rem)] -my-6 md:-my-8 bg-transparent overflow-hidden animate-in fade-in duration-500">
       {/* Chat Area */}
       <div 
         ref={scrollRef}
         className="flex-1 overflow-y-auto p-6 space-y-6 scroll-smooth bg-background/30"
       >
         {messages.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-full max-w-2xl mx-auto text-center space-y-8 animate-in slide-in-from-bottom-4 duration-700">
-            <div className="h-20 w-20 rounded-3xl bg-linear-to-br from-primary/20 to-primary/5 flex items-center justify-center shadow-inner border border-primary/10">
-              <Bot className="h-10 w-10 text-primary" />
+          <div className="flex flex-col items-center max-w-2xl mx-auto text-center space-y-8 animate-in slide-in-from-bottom-4 duration-700 pt-20 md:pt-32 pb-8">
+            <div className="relative group flex flex-col items-center justify-center">
+              <div className="flex h-24 w-32 rounded-lg border border-border/60 bg-card shadow-sm items-start p-3 overflow-hidden transition-all duration-500 hover:shadow-md hover:border-primary/30">
+                <div className="flex flex-col gap-2 w-full">
+                  {/* Window Controls */}
+                  <div className="flex items-center gap-1.5 mb-1">
+                    <div className="h-2 w-2 rounded-full bg-destructive/60" />
+                    <div className="h-2 w-2 rounded-full bg-accent-amber/60" />
+                    <div className="h-2 w-2 rounded-full bg-emerald-500/60" />
+                  </div>
+                  {/* Mock Code Lines */}
+                  <div className="h-1.5 w-3/4 rounded-full bg-muted-foreground/20" />
+                  <div className="h-1.5 w-1/2 rounded-full bg-muted-foreground/20" />
+                  {/* Typing Cursor */}
+                  <div className="flex items-center gap-1.5 mt-1">
+                    <span className="text-[10px] font-mono text-primary font-bold">{">"}</span>
+                    <span className="inline-block w-1.5 h-3 bg-primary animate-pulse" />
+                  </div>
+                </div>
+              </div>
+              {/* Subtle Background Glow */}
+              <div className="absolute inset-0 bg-primary/5 rounded-full blur-2xl -z-10 opacity-50 group-hover:opacity-100 transition-opacity duration-500" />
             </div>
             <div className="space-y-2">
               <h2 className="text-2xl font-bold text-foreground">How can I help you today?</h2>
@@ -152,8 +158,8 @@ export default function QaPage() {
       </div>
 
       {/* Input Area */}
-      <div className="p-4 bg-background/80 backdrop-blur-lg border-t border-border/50">
-        <form onSubmit={handleSubmit} className="relative max-w-4xl mx-auto flex items-end gap-2 bg-card border border-border rounded-2xl p-2 shadow-sm focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary transition-all">
+      <div className="p-2 md:p-3 bg-background/80 backdrop-blur-lg border-t border-border/50">
+        <form onSubmit={handleSubmit} className="relative max-w-4xl mx-auto flex items-end gap-2 bg-card border border-border rounded-xl p-1.5 shadow-sm focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary transition-all">
           <textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}
@@ -165,20 +171,20 @@ export default function QaPage() {
             }}
             placeholder="Ask a question about the repository... (Press Enter to send)"
             rows={1}
-            className="flex-1 max-h-32 min-h-[44px] resize-none bg-transparent px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none scrollbar-thin"
-            style={{ height: '44px' }}
+            className="flex-1 max-h-32 min-h-[36px] resize-none bg-transparent px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none scrollbar-thin"
+            style={{ height: '36px' }}
             disabled={isLoading || !projectId}
           />
           <Button 
             type="submit" 
             size="icon" 
             disabled={!input.trim() || isLoading || !projectId}
-            className="h-11 w-11 shrink-0 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm"
+            className="h-9 w-9 shrink-0 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm"
           >
             <Send className="h-4 w-4" />
           </Button>
         </form>
-        <p className="text-center text-xs text-muted-foreground mt-3">
+        <p className="text-center text-[10px] text-muted-foreground mt-1.5">
           AI can make mistakes. Verify information against the actual source code.
         </p>
       </div>

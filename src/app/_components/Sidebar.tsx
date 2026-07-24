@@ -77,14 +77,14 @@ export default function AppSidebar({ user, dbUser, signOutAction }: AppSidebarPr
     : user?.email?.substring(0, 2).toUpperCase() ?? "US";
 
   return (
-    <Sidebar collapsible="none" className="border border-border bg-card/90 backdrop-blur-md rounded-2xl shadow-md h-full">
+    <Sidebar collapsible="none" className="border-r border-border bg-background h-full">
       <SidebarContent className="py-4">
         <SidebarGroup>
-          <SidebarGroupLabel className="px-4 text-[11px] font-bold text-muted-foreground/75 tracking-wider uppercase mb-2">
+          <SidebarGroupLabel className="px-4 text-xs font-bold text-muted-foreground tracking-widest uppercase mb-2">
             Application
           </SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu className="gap-1.5 px-2">
+            <SidebarMenu className="gap-2 px-2">
               {items.map((item) => {
                 const isActive = mounted && pathname === item.url;
                 return (
@@ -94,9 +94,9 @@ export default function AppSidebar({ user, dbUser, signOutAction }: AppSidebarPr
                       tooltip={item.title}
                       render={<Link href={item.url} />}
                       className={cn(
-                        "w-full transition-all duration-200 h-11 px-4 rounded-xl flex items-center gap-3.5 text-[13.5px]",
+                        "w-full transition-all duration-200 h-10 px-4 rounded-xl flex items-center gap-4 text-sm",
                         isActive 
-                          ? "!bg-primary !text-primary-foreground hover:!bg-primary/95 hover:!text-primary-foreground shadow-md shadow-primary/10 font-semibold" 
+                          ? "bg-primary! text-primary-foreground! hover:bg-primary/95! hover:text-primary-foreground! shadow-md shadow-primary/10 font-bold" 
                           : "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground text-muted-foreground font-medium"
                       )}
                     >
@@ -111,12 +111,12 @@ export default function AppSidebar({ user, dbUser, signOutAction }: AppSidebarPr
         </SidebarGroup>
 
         {/* Your Projects Section */}
-        <SidebarGroup className="mt-2">
-          <SidebarGroupLabel className="px-4 text-[11px] font-bold text-muted-foreground/75 tracking-wider uppercase mb-2">
+        <SidebarGroup className="mt-4">
+          <SidebarGroupLabel className="px-4 text-xs font-bold text-muted-foreground tracking-widest uppercase mb-2">
             Your Projects
           </SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu className="gap-1 px-2">
+            <SidebarMenu className="gap-2 px-2">
               {isLoading ? (
                 <div className="flex flex-col gap-2 p-2">
                   <div className="h-6 bg-muted animate-pulse rounded-lg w-full" />
@@ -133,15 +133,15 @@ export default function AppSidebar({ user, dbUser, signOutAction }: AppSidebarPr
                         render={<Link href="/dashboard" />}
                         onClick={() => setProjectId(project.id)}
                         className={cn(
-                          "w-full transition-all duration-200 h-11 px-3 rounded-xl flex items-center gap-3.5 font-medium cursor-pointer",
+                          "w-full transition-all duration-200 h-10 px-3 rounded-xl flex items-center gap-4 cursor-pointer",
                           isActive
-                            ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                            : "hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground text-muted-foreground"
+                            ? "bg-sidebar-accent text-sidebar-accent-foreground font-bold"
+                            : "hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground text-muted-foreground font-medium"
                         )}
                       >
                         <div 
                           className={cn(
-                            "flex h-8.5 w-8.5 shrink-0 items-center justify-center rounded-lg text-[12px] font-bold border transition-colors shadow-xs",
+                            "flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-xs font-bold border transition-colors shadow-sm",
                             isActive
                               ? "border-primary bg-primary text-primary-foreground"
                               : "border-border bg-muted text-muted-foreground"
@@ -149,7 +149,7 @@ export default function AppSidebar({ user, dbUser, signOutAction }: AppSidebarPr
                         >
                           {project.name.charAt(0).toUpperCase()}
                         </div>
-                        <span className="truncate text-foreground/90 font-medium text-[13px]">
+                        <span className="truncate text-foreground/90 text-sm">
                           {project.name}
                         </span>
                       </SidebarMenuButton>
@@ -157,7 +157,7 @@ export default function AppSidebar({ user, dbUser, signOutAction }: AppSidebarPr
                   );
                 })
               ) : (
-                <div className="text-xs text-muted-foreground/60 px-4 py-2">
+                <div className="text-sm text-muted-foreground/60 px-4 py-2">
                   No projects linked
                 </div>
               )}
@@ -165,12 +165,12 @@ export default function AppSidebar({ user, dbUser, signOutAction }: AppSidebarPr
           </SidebarGroupContent>
           
           {/* Create Project Button */}
-          <div className="px-2 mt-3">
+          <div className="px-2 mt-4">
             <Link href="/create" className="w-full block">
               <button 
-                className="flex items-center gap-2.5 w-full px-4 h-10 border border-border/80 bg-card hover:bg-sidebar-accent text-foreground text-[13px] font-bold rounded-xl transition-all shadow-xs cursor-pointer active:scale-98"
+                className="flex items-center gap-2 w-full px-4 h-10 border border-border/80 bg-card hover:bg-sidebar-accent text-foreground text-sm font-bold rounded-xl transition-all shadow-sm cursor-pointer hover:shadow-md"
               >
-                <Plus className="h-4.5 w-4.5 text-muted-foreground" />
+                <Plus className="h-5 w-5 text-muted-foreground" />
                 <span>Create Project</span>
               </button>
             </Link>
@@ -180,20 +180,20 @@ export default function AppSidebar({ user, dbUser, signOutAction }: AppSidebarPr
 
       {/* Sidebar Footer with User Details */}
       <SidebarFooter className="border-t border-sidebar-border/50 p-4 mt-auto">
-        <div className="flex items-center gap-3 bg-accent/35 p-2.5 rounded-xl border border-border/40">
+        <div className="flex items-center gap-4 bg-accent/35 p-3 rounded-xl border border-border/40 hover:bg-accent/50 transition-colors">
           <Avatar className="h-10 w-10 border border-primary/10 bg-primary/5 shrink-0">
             {dbUser?.imageUrl ? (
               <AvatarImage src={dbUser.imageUrl} alt={userDisplayName} />
             ) : null}
-            <AvatarFallback className="text-xs font-extrabold bg-primary/10 text-primary">
+            <AvatarFallback className="text-sm font-bold bg-primary/10 text-primary">
               {userInitials}
             </AvatarFallback>
           </Avatar>
           <div className="flex flex-col min-w-0 flex-1">
-            <span className="text-xs font-bold text-foreground/90 truncate leading-snug">
+            <span className="text-sm font-bold text-foreground/90 truncate leading-snug">
               {userDisplayName}
             </span>
-            <span className="text-[10px] text-muted-foreground truncate leading-normal">
+            <span className="text-xs text-muted-foreground truncate leading-normal">
               {user?.email}
             </span>
           </div>
@@ -202,9 +202,9 @@ export default function AppSidebar({ user, dbUser, signOutAction }: AppSidebarPr
               type="submit" 
               variant="ghost" 
               size="icon" 
-              className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-colors"
+              className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-colors focus:ring-2 focus:ring-destructive/20"
             >
-              <LogOut className="h-4.5 w-4.5" />
+              <LogOut className="h-5 w-5" />
             </Button>
           </form>
         </div>

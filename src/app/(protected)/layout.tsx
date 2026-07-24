@@ -36,15 +36,20 @@ export default async function SidebarLayout({ children }: Props) {
 
   return (
     <SidebarProvider className="flex-col h-screen w-screen overflow-hidden bg-background">
-      <div className="flex h-screen w-screen flex-col overflow-hidden bg-background text-foreground dark:[color-scheme:dark] p-3 gap-3">
+      <div className="flex h-screen w-screen flex-col overflow-hidden bg-background text-foreground dark:scheme-dark">
         {/* Top Navbar */}
-        <header className="flex h-16 shrink-0 items-center justify-between border border-border bg-card/90 px-6 backdrop-blur-md z-10 rounded-2xl shadow-md">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-md shadow-primary/30">
-              <Code2 className="h-5.5 w-5.5" />
+        <header className="flex h-16 shrink-0 items-center justify-between border-b border-border bg-background px-6 z-10">
+          <div className="flex items-center gap-4">
+            {/* Custom Logo (Geometric) */}
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-full w-full text-primary">
+                <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="currentColor" fillOpacity="0.2" stroke="currentColor" strokeWidth="2" strokeLinejoin="round"/>
+                <path d="M2 17L12 22L22 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M2 12L12 17L22 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
             </div>
             <div className="flex flex-col">
-              <span className="font-bold text-base tracking-wide bg-gradient-to-r from-primary to-violet-500 bg-clip-text text-transparent">
+              <span className="font-bold text-base tracking-wide text-foreground">
                 Repo Review
               </span>
               <span className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider leading-none mt-0.5">
@@ -55,13 +60,13 @@ export default async function SidebarLayout({ children }: Props) {
 
           <div className="flex items-center gap-4">
             {/* Credits counter */}
-            <div className="flex items-center gap-1.5 rounded-full bg-amber-500/10 px-3.5 py-1.5 text-xs font-semibold text-amber-600 dark:text-amber-500 border border-amber-500/20">
-              <Coins className="h-3.5 w-3.5" />
+            <div className="flex items-center gap-2 rounded-full bg-accent-amber/10 px-4 py-1.5 text-xs font-semibold text-accent-amber border border-accent-amber/20">
+              <Coins className="h-4 w-4" />
               <span>{dbUser?.credits ?? 0} Credits</span>
             </div>
 
             {/* User Avatar */}
-            <Avatar className="h-9 w-9 border border-border bg-neutral-800 text-white shrink-0 shadow-sm">
+            <Avatar className="h-9 w-9 border border-border bg-neutral-800 text-white shrink-0">
               {dbUser?.imageUrl ? (
                 <AvatarImage src={dbUser.imageUrl} alt={userDisplayName} />
               ) : null}
@@ -73,11 +78,11 @@ export default async function SidebarLayout({ children }: Props) {
         </header>
 
         {/* Page Content & Sidebar Wrapper */}
-        <div className="flex flex-1 overflow-hidden w-full gap-3">
+        <div className="flex flex-1 overflow-hidden w-full">
           <AppSidebar user={user} dbUser={dbUser} signOutAction={signOutAction} />
           
           {/* Page Content Panel */}
-          <main className="flex-1 overflow-y-auto bg-card/90 border border-border rounded-2xl shadow-md p-6 md:p-8">
+          <main className="relative flex-1 overflow-y-auto bg-background p-6 md:p-8 scrollbar-hide">
             <div className="mx-auto max-w-7xl">
               {children}
             </div>

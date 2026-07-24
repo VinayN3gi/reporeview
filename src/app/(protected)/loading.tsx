@@ -13,7 +13,7 @@ export default function Loading() {
           {/* Animated Spinner with Core Icon */}
           <div className="relative flex items-center justify-center">
             {/* Spinning Outer Ring */}
-            <div className="h-16 w-16 rounded-full border-3 border-muted/30 border-t-primary border-r-violet-500 animate-spin" />
+            <div className="h-16 w-16 rounded-full border-4 border-muted/30 border-t-primary border-r-accent-violet animate-spin" />
             
             {/* Pulsing Center Icon */}
             <div className="absolute flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary animate-pulse">

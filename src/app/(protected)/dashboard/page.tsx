@@ -20,8 +20,6 @@ import CommitCard from "./commit-card";
 import { formatDistanceToNow } from "date-fns";
 import { askQuestion } from "@/lib/action";
 import dynamic from "next/dynamic";
-import { UploadMeeting } from "@/components/UploadMeeting";
-import { Dialog, DialogContent, DialogTrigger, DialogTitle } from "@/components/ui/dialog";
 
 const MDEditorMarkdown = dynamic(
   () => import("@uiw/react-md-editor").then((mod) => mod.default.Markdown),
@@ -122,7 +120,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-500">
+    <div className="space-y-8 animate-in fade-in duration-500">
       {/* GitHub Link Banner + Actions Row */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         {/* GitHub Linked Badge */}
@@ -130,28 +128,28 @@ export default function DashboardPage() {
           href={project.githubUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="group inline-flex items-center gap-2.5 px-4 py-2.5 bg-primary text-primary-foreground rounded-xl text-sm font-semibold hover:bg-primary/90 transition-all shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/30"
+          className="group inline-flex items-center gap-2 px-3 py-1.5 border border-border bg-transparent hover:bg-muted/50 text-muted-foreground hover:text-foreground rounded-lg text-sm font-medium transition-colors focus:ring-2 focus:ring-primary/20 focus:outline-none shadow-sm"
         >
-          <GithubIcon className="h-4.5 w-4.5" />
-          <span>This project is linked to {project.githubUrl}</span>
-          <ExternalLink className="h-3.5 w-3.5 opacity-70 group-hover:opacity-100 transition-opacity" />
+          <GithubIcon className="h-4 w-4" />
+          <span>Linked to <span className="font-semibold text-foreground/80 group-hover:text-foreground">{project.githubUrl.split('github.com/')[1] || project.githubUrl}</span></span>
+          <ExternalLink className="h-3.5 w-3.5 opacity-0 group-hover:opacity-100 transition-opacity -ml-0.5" />
         </a>
 
         {/* Action Buttons */}
-        <div className="flex items-center gap-2.5">
-          <button className="inline-flex items-center gap-2 px-4 py-2.5 border border-border bg-card hover:bg-accent text-foreground rounded-xl text-sm font-semibold transition-all hover:shadow-sm active:scale-[0.98] cursor-pointer">
-            <Users className="h-4 w-4 text-muted-foreground" />
-            Invite a team member!
+        <div className="flex items-center gap-4">
+          <button className="inline-flex items-center gap-2 px-4 py-2 border-2 border-border/50 bg-transparent hover:bg-accent hover:text-accent-foreground text-muted-foreground rounded-xl text-sm font-bold transition-all active:scale-[0.98] cursor-pointer focus:ring-2 focus:ring-primary/20 focus:outline-none">
+            <Users className="h-4 w-4" />
+            Invite a team member
           </button>
-          <button className="inline-flex items-center gap-2 px-4 py-2.5 border border-border bg-card hover:bg-accent text-foreground rounded-xl text-sm font-semibold transition-all hover:shadow-sm active:scale-[0.98] cursor-pointer">
-            <Archive className="h-4 w-4 text-muted-foreground" />
+          <button className="inline-flex items-center gap-2 px-4 py-2 border-2 border-border/50 bg-transparent hover:bg-accent hover:text-accent-foreground text-muted-foreground rounded-xl text-sm font-bold transition-all active:scale-[0.98] cursor-pointer focus:ring-2 focus:ring-primary/20 focus:outline-none">
+            <Archive className="h-4 w-4" />
             Archive
           </button>
         </div>
       </div>
 
-      {/* Two Column Cards: Ask a Question + Create Meeting */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+      {/* Single Column Card: Ask a Question */}
+      <div className="grid grid-cols-1 gap-6">
         {/* Ask a Question Card */}
         <div className="group relative overflow-hidden border border-border bg-card rounded-2xl p-6 shadow-sm hover:shadow-md transition-all duration-300">
           {/* Subtle gradient accent */}
@@ -162,7 +160,7 @@ export default function DashboardPage() {
                 <Sparkles className="h-5 w-5 text-primary" />
                 Ask a question
               </h3>
-              <p className="text-sm text-muted-foreground mt-1">
+              <p className="text-sm text-muted-foreground mt-1 max-w-prose">
                 Repo Review has knowledge of the codebase. Ask anything about{" "}
                 <span className="font-semibold text-foreground/80">{project.name}</span>.
               </p>
@@ -175,60 +173,30 @@ export default function DashboardPage() {
                 onChange={(e) => setQuestion(e.target.value)}
                 placeholder="Which file should I edit to change the home page?"
                 rows={3}
-                className="w-full resize-none rounded-xl border border-border bg-background/60 px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                className="w-full resize-none rounded-xl border border-border bg-background/60 p-4 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all leading-relaxed"
               />
               
               <button
                 type="submit"
                 disabled={asking || !question.trim()}
-                className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-primary-foreground rounded-xl text-sm font-semibold hover:bg-primary/90 transition-all shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/30 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-xl text-sm font-bold hover:bg-primary/90 transition-all shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/30 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed focus:ring-2 focus:ring-primary/50 focus:outline-none"
               >
-                {asking ? <Loader2 className="h-4 w-4 animate-spin" /> : <Bot className="h-4 w-4" />}
+                {asking ? <Loader2 className="h-5 w-5 animate-spin" /> : <Bot className="h-5 w-5" />}
                 {asking ? "Asking..." : "Ask Repo Review!"}
               </button>
             </form>
 
             {answer && (
-              <div className="mt-4 p-4 bg-background/80 rounded-xl border border-border">
-                <div className="flex items-center gap-2 mb-2">
+              <div className="mt-6 p-6 bg-background/80 rounded-xl border border-border">
+                <div className="flex items-center gap-2 mb-4">
                   <Sparkles className="h-4 w-4 text-primary" />
-                  <span className="text-sm font-semibold text-primary">Answer</span>
+                  <span className="text-sm font-bold text-primary">Answer</span>
                 </div>
-                <div className="text-sm text-foreground/90 prose prose-sm dark:prose-invert max-w-none" data-color-mode="light">
+                <div className="text-sm text-foreground/90 prose prose-sm dark:prose-invert max-w-prose leading-relaxed" data-color-mode="light">
                   <MDEditorMarkdown source={answer} style={{ background: 'transparent' }} />
                 </div>
               </div>
             )}
-          </div>
-        </div>
-
-        {/* Create a New Meeting Card */}
-        <div className="group relative overflow-hidden border border-border bg-card rounded-2xl p-6 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col items-center justify-center text-center">
-          <div className="absolute inset-0 bg-linear-to-br from-violet-500/3 to-transparent pointer-events-none" />
-          <div className="relative flex flex-col items-center gap-4">
-            <div className="h-16 w-16 rounded-2xl bg-muted/60 flex items-center justify-center border border-border/50">
-              <Monitor className="h-8 w-8 text-foreground/70" />
-            </div>
-            <div>
-              <h3 className="text-lg font-bold text-foreground">Create a new meeting</h3>
-              <p className="text-sm text-muted-foreground mt-1.5 max-w-xs">
-                Analyse your meeting with Repo Review.
-                <br />
-                <span className="text-xs font-medium text-primary/80">Powered by AI.</span>
-              </p>
-            </div>
-            <Dialog>
-              <DialogTrigger
-                className="inline-flex items-center gap-2 px-5 py-2.5 border-2 border-foreground/80 text-foreground rounded-xl text-sm font-bold hover:bg-foreground hover:text-background transition-all active:scale-[0.98]"
-              >
-                <Upload className="h-4 w-4" />
-                Upload Meeting
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-xl p-0 border-none bg-transparent shadow-none">
-                <DialogTitle className="sr-only">Upload Meeting</DialogTitle>
-                <UploadMeeting />
-              </DialogContent>
-            </Dialog>
           </div>
         </div>
       </div>
@@ -244,7 +212,7 @@ export default function DashboardPage() {
       ) : commits.length > 0 ? (
         <div className="relative">
           {/* Vertical timeline line */}
-          <div className="absolute left-[17px] top-6 bottom-6 w-[2px] bg-border" />
+          <div className="absolute left-4.25 top-6 bottom-6 w-0.5 bg-border" />
 
           <div className="flex flex-col gap-3">
             {commits.map((commit) => (
