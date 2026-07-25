@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
 import { Coins, Code2 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { InvitationModal } from "@/app/_components/invitation-modal";
 
 type Props = {
   children: React.ReactNode;
@@ -87,6 +88,8 @@ export default async function SidebarLayout({ children }: Props) {
               {children}
             </div>
           </main>
+          
+          <InvitationModal />
         </div>
       </div>
     </SidebarProvider>

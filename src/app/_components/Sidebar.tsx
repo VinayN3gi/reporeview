@@ -12,7 +12,7 @@ import {
   SidebarFooter,
 } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
-import { Bot, CreditCard, LayoutDashboard, Presentation, LogOut, Folder, Plus } from "lucide-react";
+import { Bot, CreditCard, LayoutDashboard, Presentation, LogOut, Folder, Plus, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React from "react";
@@ -30,16 +30,6 @@ const items = [
     title: "Q&A",
     url: "/qa",
     icon: Bot,
-  },
-  {
-    title: "Meetings",
-    url: "/meetings",
-    icon: Presentation,
-  },
-  {
-    title: "Billing",
-    url: "/billing",
-    icon: CreditCard,
   },
 ];
 
@@ -62,6 +52,7 @@ interface AppSidebarProps {
 export default function AppSidebar({ user, dbUser, signOutAction }: AppSidebarProps) {
   const pathname = usePathname();
   const [mounted, setMounted] = React.useState(false);
+  const [isLoggingOut, setIsLoggingOut] = React.useState(false);
   const { projects, projectId, setProjectId, isLoading } = useProject();
 
   React.useEffect(() => {
@@ -197,14 +188,22 @@ export default function AppSidebar({ user, dbUser, signOutAction }: AppSidebarPr
               {user?.email}
             </span>
           </div>
-          <form action={signOutAction} className="shrink-0">
+          <form action={async (formData) => {
+            setIsLoggingOut(true);
+            try {
+              await signOutAction(formData);
+            } catch {
+              setIsLoggingOut(false);
+            }
+          }} className="shrink-0">
             <Button 
               type="submit" 
+              disabled={isLoggingOut}
               variant="ghost" 
               size="icon" 
               className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-colors focus:ring-2 focus:ring-destructive/20"
             >
-              <LogOut className="h-5 w-5" />
+              {isLoggingOut ? <Loader2 className="h-4 w-4 animate-spin" /> : <LogOut className="h-5 w-5" />}
             </Button>
           </form>
         </div>

@@ -59,14 +59,235 @@ export const projectRouter = createTRPCRouter({
 
     return ctx.db.project.findMany({
       where: {
-        userId: user.id,
         deletedAt: null,
+        OR: [
+          { userId: user.id },
+          { userToProjects: { some: { userId: user.id, status: "ACCEPTED" } } },
+        ],
       },
       orderBy: {
         createdAt: "desc",
       },
     });
   }),
+
+  getPendingInvitations: publicProcedure.query(async ({ ctx }) => {
+    const user = await getCurrentUserAction();
+    if (!user) {
+      throw new TRPCError({
+        code: "UNAUTHORIZED",
+        message: "You must be logged in to view invitations",
+      });
+    }
+
+    return ctx.db.userToProject.findMany({
+      where: {
+        userId: user.id,
+        status: "PENDING",
+      },
+      include: {
+        project: {
+          include: {
+            user: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+  }),
+
+  respondToInvitation: publicProcedure
+    .input(z.object({ projectId: z.string(), accept: z.boolean() }))
+    .mutation(async ({ ctx, input }) => {
+      const user = await getCurrentUserAction();
+      if (!user) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "You must be logged in to respond to invitations",
+        });
+      }
+
+      const existingInvite = await ctx.db.userToProject.findUnique({
+        where: {
+          userId_projectId: {
+            userId: user.id,
+            projectId: input.projectId,
+          },
+        },
+      });
+
+      if (!existingInvite || existingInvite.status !== "PENDING") {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Invitation not found or already processed",
+        });
+      }
+
+      if (input.accept) {
+        await ctx.db.userToProject.update({
+          where: {
+            userId_projectId: {
+              userId: user.id,
+              projectId: input.projectId,
+            },
+          },
+          data: {
+            status: "ACCEPTED",
+          },
+        });
+      } else {
+        await ctx.db.userToProject.update({
+          where: {
+            userId_projectId: {
+              userId: user.id,
+              projectId: input.projectId,
+            },
+          },
+          data: {
+            status: "DECLINED",
+          },
+        });
+      }
+
+      return { success: true };
+    }),
+
+  addMember: publicProcedure
+    .input(z.object({ projectId: z.string(), emailAddress: z.string().email() }))
+    .mutation(async ({ ctx, input }) => {
+      const user = await getCurrentUserAction();
+
+      if (!user) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "You must be logged in to add members",
+        });
+      }
+
+      // Check if user is the project owner
+      const project = await ctx.db.project.findUnique({
+        where: { id: input.projectId, userId: user.id },
+      });
+
+      if (!project) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "Project not found or you don't have permission to invite members",
+        });
+      }
+
+      const member = await ctx.db.user.findUnique({
+        where: { emailAddress: input.emailAddress },
+      });
+
+      if (!member) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "User not found with this email",
+        });
+      }
+
+      if (member.id === user.id) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "You cannot add yourself to the project",
+        });
+      }
+
+      // Check if already a member
+      const existingMember = await ctx.db.userToProject.findUnique({
+        where: {
+          userId_projectId: {
+            userId: member.id,
+            projectId: input.projectId,
+          },
+        },
+      });
+
+      if (existingMember) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "User is already a member of this project",
+        });
+      }
+
+      await ctx.db.userToProject.create({
+        data: {
+          userId: member.id,
+          projectId: input.projectId,
+        },
+      });
+
+      return { success: true };
+    }),
+
+  getTeamMembers: publicProcedure
+    .input(z.object({ projectId: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const user = await getCurrentUserAction();
+      if (!user) {
+        throw new TRPCError({ code: "UNAUTHORIZED", message: "Not logged in" });
+      }
+
+      const project = await ctx.db.project.findUnique({
+        where: { id: input.projectId },
+        include: {
+          userToProjects: {
+            include: {
+              user: true,
+            },
+          },
+          user: true, // owner
+        },
+      });
+
+      if (!project) throw new TRPCError({ code: "NOT_FOUND" });
+
+      // Ensure requester is owner or member
+      const isOwner = project.userId === user.id;
+      const isMember = project.userToProjects.some(m => m.userId === user.id && m.status === "ACCEPTED");
+      
+      if (!isOwner && !isMember) {
+        throw new TRPCError({ code: "UNAUTHORIZED", message: "No access to this project" });
+      }
+
+      return {
+        owner: project.user,
+        members: project.userToProjects,
+        isOwner,
+      };
+    }),
+
+  removeMember: publicProcedure
+    .input(z.object({ projectId: z.string(), memberId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const user = await getCurrentUserAction();
+      if (!user) throw new TRPCError({ code: "UNAUTHORIZED" });
+
+      const project = await ctx.db.project.findUnique({
+        where: { id: input.projectId, userId: user.id },
+      });
+
+      if (!project) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "Project not found or you don't have permission to remove members",
+        });
+      }
+
+      await ctx.db.userToProject.delete({
+        where: {
+          userId_projectId: {
+            userId: input.memberId,
+            projectId: input.projectId,
+          },
+        },
+      });
+
+      return { success: true };
+    }),
 
   getCommits: publicProcedure
     .input(

@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import CommitCard from "./commit-card";
+import InviteButton from "./invite-button";
 import { formatDistanceToNow } from "date-fns";
 import { askQuestion } from "@/lib/action";
 import dynamic from "next/dynamic";
@@ -137,10 +138,7 @@ export default function DashboardPage() {
 
         {/* Action Buttons */}
         <div className="flex items-center gap-4">
-          <button className="inline-flex items-center gap-2 px-4 py-2 border-2 border-border/50 bg-transparent hover:bg-accent hover:text-accent-foreground text-muted-foreground rounded-xl text-sm font-bold transition-all active:scale-[0.98] cursor-pointer focus:ring-2 focus:ring-primary/20 focus:outline-none">
-            <Users className="h-4 w-4" />
-            Invite a team member
-          </button>
+          <InviteButton projectId={project.id} />
           <button className="inline-flex items-center gap-2 px-4 py-2 border-2 border-border/50 bg-transparent hover:bg-accent hover:text-accent-foreground text-muted-foreground rounded-xl text-sm font-bold transition-all active:scale-[0.98] cursor-pointer focus:ring-2 focus:ring-primary/20 focus:outline-none">
             <Archive className="h-4 w-4" />
             Archive
