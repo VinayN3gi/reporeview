@@ -4,7 +4,6 @@ import AppSidebar from "@/app/_components/Sidebar";
 import { getCurrentUserAction, getCurrentDbUserAction } from "@/app/actions/user";
 import { redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
-import { Coins, Code2 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { InvitationModal } from "@/app/_components/invitation-modal";
 
@@ -60,12 +59,6 @@ export default async function SidebarLayout({ children }: Props) {
           </div>
 
           <div className="flex items-center gap-4">
-            {/* Credits counter */}
-            <div className="flex items-center gap-2 rounded-full bg-accent-amber/10 px-4 py-1.5 text-xs font-semibold text-accent-amber border border-accent-amber/20">
-              <Coins className="h-4 w-4" />
-              <span>{dbUser?.credits ?? 0} Credits</span>
-            </div>
-
             {/* User Avatar */}
             <Avatar className="h-9 w-9 border border-border bg-neutral-800 text-white shrink-0">
               {dbUser?.imageUrl ? (

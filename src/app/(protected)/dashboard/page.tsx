@@ -6,7 +6,6 @@ import { api } from "@/trpc/react";
 import {
   ExternalLink,
   Users,
-  Archive,
   Bot,
   Monitor,
   Upload,
@@ -139,10 +138,6 @@ export default function DashboardPage() {
         {/* Action Buttons */}
         <div className="flex items-center gap-4">
           <InviteButton projectId={project.id} />
-          <button className="inline-flex items-center gap-2 px-4 py-2 border-2 border-border/50 bg-transparent hover:bg-accent hover:text-accent-foreground text-muted-foreground rounded-xl text-sm font-bold transition-all active:scale-[0.98] cursor-pointer focus:ring-2 focus:ring-primary/20 focus:outline-none">
-            <Archive className="h-4 w-4" />
-            Archive
-          </button>
         </div>
       </div>
 

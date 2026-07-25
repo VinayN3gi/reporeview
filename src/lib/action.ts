@@ -33,13 +33,15 @@ export async function askQuestion(question: string, projectId: string) {
             LIMIT 5;
         ` as { fileName: string, summary: string, sourceCode: string, similarity: number }[];
 
-        if (!result || result.length === 0) {
+        const relevantResults = result.filter(r => r.similarity >= 0.7);
+
+        if (!relevantResults || relevantResults.length === 0) {
             return "I couldn't find any relevant code in this repository to answer your question. Make sure the repository has been indexed.";
         }
 
         // 3. Construct context from retrieved documents
         let context = "";
-        for (const file of result) {
+        for (const file of relevantResults) {
             context += `--- File: ${file.fileName} ---\nSummary: ${file.summary}\nCode:\n${file.sourceCode}\n\n`;
         }
 
