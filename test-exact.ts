@@ -1,5 +1,6 @@
+// @ts-nocheck
 import { PrismaClient } from './generated/prisma/index.js';
-import { generateEmebeddings } from './src/lib/gemini.ts';
+import { generateEmebeddings } from './src/lib/gemini';
 import fs from 'fs';
 
 const envFile = fs.readFileSync('.env', 'utf-8');
